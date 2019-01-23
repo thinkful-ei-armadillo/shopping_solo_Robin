@@ -2,12 +2,13 @@
 
 const STORE = {
 	items: [
-		{name: 'apples', checked: false},
-		{name: 'oranges', checked: false},
-		{name: 'milk', checked: true},
-		{name: 'bread', checked: false}
+		{name: 'apples', checked: false, filtered: false},
+		{name: 'oranges', checked: false, filtered: false},
+		{name: 'milk', checked: true, filtered: false},
+		{name: 'bread', checked: false, filtered: false}
 	],
-	hideChecked: false,
+  hideChecked: false,
+  searchList: false
 };
 
 
@@ -45,7 +46,10 @@ function renderShoppingList() {
     const uncheckedItemFilter = STORE.items.filter(item => (item.checked === false));
     shoppingListItemsString = generateShoppingItemsString(uncheckedItemFilter);
   }
-  
+  else if(STORE.searchList){
+    const searchFilter = STORE.items.filter(item => item.filtered === true);
+    shoppingListItemsString = generateShoppingItemsString(searchFilter);
+  }
   else {
     shoppingListItemsString = generateShoppingItemsString(STORE.items);
   }
@@ -61,13 +65,45 @@ function addItemToShoppingList(itemName) {
 }
 
 function handleNewItemSubmit() {
-  $('#js-shopping-list-form').submit(function(event) {
+  $('#js-shopping-list-form').on('click', '[name="addItem"]', function(event) {
     event.preventDefault();
     console.log('`handleNewItemSubmit` ran');
     const newItemName = $('.js-shopping-list-entry').val();
     $('.js-shopping-list-entry').val('');
     addItemToShoppingList(newItemName);
     renderShoppingList();
+  });
+}
+
+function searchItemFilter(item){
+  
+}
+
+function handleSearchItem(){
+  $('#js-shopping-list-form').on('click', '[name="searchButton"]', function(event) {
+    console.log('`search` ran');
+    event.preventDefault();
+    const filteredItem = $('.js-search-shopping-list').val();
+    $('.js-search-shopping-list').val("");
+    const searchedItem = STORE.items.find(item => item.name === filteredItem);
+    if(searchedItem !== undefined){
+      searchedItem.filtered = true;
+      STORE.searchList = true;
+      renderShoppingList();
+    } else {
+      alert("Sorry not in list");
+    };
+   
+    console.log(STORE);
+
+    // getItemIndexFromElement()
+    // STORE.searchList = true;
+    // renderShoppingList();
+    
+    // const newItemName = $('.js-shopping-list-entry').val();
+    // $('.js-shopping-list-entry').val('');
+    // addItemToShoppingList(newItemName);
+    // renderShoppingList();
   });
 }
 
@@ -97,6 +133,7 @@ function deleteFromListItems(index){
   STORE.items.splice(index, 1);
   console.log(STORE);
 }
+
 function handleDeleteItemClicked() {
   // this function will be responsible for when users want to delete a shopping list
   // item
@@ -131,6 +168,7 @@ function handleShoppingList() {
   handleItemCheckClicked();
   handleDeleteItemClicked();
   displayCheckedItems();
+  handleSearchItem();
 }
 
 
